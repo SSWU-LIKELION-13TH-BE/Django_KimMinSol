@@ -22,3 +22,6 @@ class LoginForm(AuthenticationForm) :
     def __init__(self, request = None, *args, **kwargs) :
         super().__init__(request, *args, **kwargs)
         self.fields['username'] = self.fields.pop('user_id')
+
+class FindPasswordForm(forms.Form) :
+    user_id = forms.CharField(label = '아이디', max_length = 30)
