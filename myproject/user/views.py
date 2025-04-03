@@ -7,7 +7,7 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            return redirect('signup')
+            return redirect('/')
         
     else :
         form = SignUpForm()
