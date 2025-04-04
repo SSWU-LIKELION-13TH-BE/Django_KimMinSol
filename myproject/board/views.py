@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Post
+from .models import Post, Comment
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -35,8 +35,37 @@ def toggle_like(request, post_id):
     return HttpResponseRedirect(reverse('post_list'))
 
 def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id) 
-    return render(request, 'board/post_detail.html', {'post': post})
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.filter(parent = None)
+    
+    if request.method == 'POST':
+        parent_id = request.POST.get('parent')
+        comment_form = CommentForm(request.POST)
+
+        if comment_form.is_valid():
+            comment = comment_form.save(commit = False)
+            comment.post = post  
+            comment.author = request.user  
+            comment.save()
+
+            if parent_id:
+                try:
+                    parent_comment = Comment.objects.get(id=parent_id)
+                    comment.parent = parent_comment
+                except Comment.DoesNotExist:
+                    pass 
+
+            comment.save()
+            return redirect('post_detail', post_id = post.id)  
+
+    else:
+        comment_form = CommentForm()
+
+    return render(request, 'board/post_detail.html', {
+        'post': post,
+        'comments': comments,
+        'comment_form': comment_form
+    })
 
 @login_required(login_url='/user/login/')
 def post_edit(request, post_id):
@@ -65,3 +94,12 @@ def post_delete(request, post_id):
         return redirect('post_list')  
     
     return render(request, 'board/post_delete.html', {'post': post})
+
+@login_required(login_url='/user/login/')
+def comment_delete(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    post_id = comment.post.id  
+
+    if request.user == comment.author:
+        comment.delete()
+    return redirect('post_detail', post_id=post_id)
