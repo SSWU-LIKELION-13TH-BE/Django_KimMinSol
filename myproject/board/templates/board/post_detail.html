@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <h2>{{ post.title }}</h2>
+    <p>작성자: {{ post.author.nickname }}</p>
+    <p>기술 스택: {{ post.tech_stack }}</p>
+    <p>{{ post.content }}</p>
+    <p>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</p>
+
+    {% if post.github_link %}
+        <p><a href="{{ post.github_link }}" target="_blank">🔗 GitHub 링크</a></p>
+    {% endif %}
+
+    {% if post.image %}
+        <p><img src="{{ post.image.url }}" alt="첨부 이미지" width="200"></p>
+    {% endif %}
+
+    {% if user == post.author %}
+        <p><a href="{% url 'post_edit' post.id %}">게시글 수정</a></p>
+        <p><a href="{% url 'post_delete' post.id %}">게시글 삭제</a></p>
+    {% endif %}
+
+    <p><a href="{% url 'post_list' %}">게시물 목록으로 돌아가기</a></p>
+</body>
+</html>

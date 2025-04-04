@@ -135,3 +135,6 @@ EMAIL_HOST_USER = 'syms2733@gmail.com'
 EMAIL_HOST_PASSWORD = 'yyoc ztep fylq znoh' 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_URL = '/user/login/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
