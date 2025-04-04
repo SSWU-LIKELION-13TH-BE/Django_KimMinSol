@@ -22,10 +22,22 @@
                     GitHub 링크 없음
                 {% endif %}
             </p>
+
             {% if post.image %}
                 <p><img src="{{ post.image.url }}" alt="첨부 이미지" width="200"></p>
             {% endif %}
+
+            <form action="{% url 'toggle_like' post.id %}" method="POST">
+                {% csrf_token %}
+                {% if user in post.likes.all %}
+                    <button type="submit">💔 좋아요 취소</button>
+                {% else %}
+                    <button type="submit">❤️ 좋아요</button>
+                {% endif %}
+                <span>총 {{ post.likes.count }}명</span>
+            </form>
         </div>
+        
     {% empty %}
         <p>게시글이 없습니다.</p>
     {% endfor %}
