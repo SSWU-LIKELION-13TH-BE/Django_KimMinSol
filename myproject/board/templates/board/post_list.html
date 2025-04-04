@@ -11,7 +11,7 @@
 
     {% for post in posts %}
         <div style="border: 1px solid gray; padding: 10px; margin-bottom: 10px;">
-            <h3>{{ post.title }}</h3>
+            <h3><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h3>
             <p>작성자: {{ post.author.nickname }}</p>
             <p>기술 스택: {{ post.tech_stack }}</p>
             <p>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</p>
@@ -36,6 +36,13 @@
                 {% endif %}
                 <span>총 {{ post.likes.count }}명</span>
             </form>
+
+            {% if user == post.author %} 
+                <p>
+                    <a href="{% url 'post_edit' post.id %}">수정</a> |
+                    <a href="{% url 'post_delete' post.id %}">삭제</a>
+                </p>
+            {% endif %}
         </div>
         
     {% empty %}
