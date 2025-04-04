@@ -29,5 +29,22 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.author.username}의 댓글" 
 
+    def like_count(self):
+        return self.likes.count()
+
+    def is_liked_by(self, user):
+        return self.likes.filter(user=user).exists()
+
+
     class Meta:
         ordering = ['created_at']
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('comment', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} → {self.comment}"

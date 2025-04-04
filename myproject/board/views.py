@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Post, Comment
-from django.http import HttpResponseRedirect
+from .models import Post, Comment, CommentLike
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 @login_required(login_url='/user/login/') 
 def post_create(request):
@@ -103,3 +104,23 @@ def comment_delete(request, comment_id):
     if request.user == comment.author:
         comment.delete()
     return redirect('post_detail', post_id=post_id)
+
+@require_POST
+@login_required(login_url='/user/login/')
+def toggle_comment_like(request):
+    comment_id = request.POST.get('comment_id')
+    comment = get_object_or_404(Comment, id=comment_id)
+    user = request.user
+
+    like, created = CommentLike.objects.get_or_create(comment=comment, user=user)
+
+    if not created:
+        like.delete()
+        liked = False
+    else:
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'like_count': comment.like_count()
+    })
