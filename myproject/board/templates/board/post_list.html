@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 목록</title>
+</head>
+<body>
+    <h2>게시글 목록을 확인하세요</h2>
+
+    <p><a href="{% url 'post_create' %}">➕ 새 게시글 작성하기</a></p>
+
+    {% for post in posts %}
+        <div style="border: 1px solid gray; padding: 10px; margin-bottom: 10px;">
+            <h3>{{ post.title }}</h3>
+            <p>작성자: {{ post.author.nickname }}</p>
+            <p>기술 스택: {{ post.tech_stack }}</p>
+            <p>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</p>
+            <p>
+                {% if post.github_url %}
+                    <a href="{{ post.github_url }}" target="_blank">🔗 GitHub 링크</a>
+                {% else %}
+                    GitHub 링크 없음
+                {% endif %}
+            </p>
+            {% if post.image %}
+                <p><img src="{{ post.image.url }}" alt="첨부 이미지" width="200"></p>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>게시글이 없습니다.</p>
+    {% endfor %}
+</body>
+</html>

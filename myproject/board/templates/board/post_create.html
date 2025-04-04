@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+</head>
+<body>
+    <h2>새 게시글 작성</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">등록</button>
+    </form>
+
+    <br>
+    <a href="{% url 'post_list' %}">← 게시글 목록으로 돌아가기</a>
+</body>
+</html>
