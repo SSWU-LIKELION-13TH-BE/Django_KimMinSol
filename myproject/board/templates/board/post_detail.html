@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ post.title }}</title>
-</head>
+</head> 
+
 <body>
     <h2>{{ post.title }}</h2>
     <p>작성자: {{ post.author.nickname }}</p>
@@ -40,42 +41,75 @@
         <div style="border: 1px solid gray; padding: 10px; margin-bottom: 10px;">
             <p><strong>{{ comment.author.nickname }}</strong> - {{ comment.created_at|date:"Y-m-d H:i" }}</p>
             <p>{{ comment.content }}</p>
-            
+
+            <button class="like-btn" data-id="{{ comment.id }}" id="like-btn-{{ comment.id }}">
+                <span class="like-icon">❤️</span>
+                <span class="like-text">좋아요</span>
+                (<span id="like-count-{{ comment.id }}">{{ comment.like_count }}</span>)
+            </button>
+
             {% if user == comment.author %}
             <a href="{% url 'comment_delete' comment.id %}">댓글삭제</a>
             {% endif %}
 
             <div style="margin-left: 20px;">
                 {% for reply in comment.replies.all %}
+                <div style="border: 1px solid lightgray; padding: 5px; margin-bottom: 5px;">
+                    <p><strong>{{ reply.author.nickname }}</strong> - {{ reply.created_at|date:"Y-m-d H:i" }}</p>
+                    <p>{{ reply.content }}</p>
 
-                    <div style="border: 1px solid lightgray; padding: 5px; margin-bottom: 5px;">
-                        <p><strong>{{ reply.author.nickname }}</strong> - {{ reply.created_at|date:"Y-m-d H:i" }}</p>
-                        <p>{{ reply.content }}</p>
-                        {% if user == reply.author %}
-                            <p><a href="{% url 'comment_delete' reply.id %}">대댓글 삭제</a></p>
-                        {% endif %}
-                    </div>
+                    <button class="like-btn" data-id="{{ reply.id }}" id="like-btn-{{ reply.id }}">
+                        <span class="like-icon">❤️</span>
+                        <span class="like-text">좋아요</span>
+                        (<span id="like-count-{{ reply.id }}">{{ reply.like_count }}</span>)
+                    </button>
 
+                    {% if user == reply.author %}
+                    <p><a href="{% url 'comment_delete' reply.id %}">대댓글 삭제</a></p>
+                    {% endif %}
+                </div>
                 {% empty %}
                 {% endfor %}
             </div>
-            
-            <div>
-                <div id="reply-{{ comment.id }}" style="margin-left: 20px;">
-                    <form method="POST" action="{% url 'post_detail' post.id %}">
-                        {% csrf_token %}
-                        {{ comment_form.as_p }}
-   
-                        <input type="hidden" name="parent" value="{{ comment.id }}">
-                        <button type="submit">대댓글 작성</button>
-                    </form>
-                </div>
+
+            <div id="reply-{{ comment.id }}" style="margin-left: 20px;">
+                <form method="POST" action="{% url 'post_detail' post.id %}">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <input type="hidden" name="parent" value="{{ comment.id }}">
+                    <button type="submit">대댓글 작성</button>
+                </form>
             </div>
         </div>
-        
         {% empty %}
-            <p>댓글이 없습니다.</p>
+        <p>댓글이 없습니다.</p>
         {% endfor %}
     </div>
+
+    <script>
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const commentId = button.dataset.id;
+
+            fetch("{% url 'toggle_comment_like' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: `comment_id=${commentId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`like-count-${commentId}`).textContent = data.like_count;
+
+                const text = button.querySelector('.like-text');
+                if (text) {
+                    text.textContent = data.liked ? '좋아요 취소' : '좋아요';
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
