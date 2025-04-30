@@ -5,6 +5,7 @@ from .models import Post, Comment, CommentLike
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.db.models import Count
 
 @login_required(login_url='/user/login/') 
 def post_create(request):
@@ -22,13 +23,18 @@ def post_create(request):
 
 def post_list(request):
     query = request.GET.get('q')  
+    sort = request.GET.get('sort')
 
     if query:
         posts = Post.objects.filter(title__icontains=query)
     else:
         posts = Post.objects.all()
 
-    posts = posts.order_by('-created_at')  # 여기서 정렬만 해줘야 함
+    if sort == 'popular':
+        posts = posts.annotate(like_count=Count('likes')).order_by('-like_count', '-created_at')
+    else:
+        posts = posts.order_by('-created_at')
+        
     return render(request, 'board/post_list.html', {'posts': posts})
 
 @login_required(login_url='/user/login/?next=/board/')
