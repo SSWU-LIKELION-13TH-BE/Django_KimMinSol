@@ -26,6 +26,7 @@
             <p>작성자: {{ post.author.nickname }}</p>
             <p>기술 스택: {{ post.tech_stack }}</p>
             <p>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</p>
+            <p>조회수: {{ post.views }}</p> 
             <p>
                 {% if post.github_url %}
                     <a href="{{ post.github_url }}" target="_blank">🔗 GitHub 링크</a>

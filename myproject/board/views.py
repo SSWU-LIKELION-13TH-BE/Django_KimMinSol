@@ -50,6 +50,10 @@ def toggle_like(request, post_id):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+
+    post.views += 1
+    post.save(update_fields=["views"])
+
     comments = post.comments.filter(parent = None)
     
     if request.method == 'POST':
