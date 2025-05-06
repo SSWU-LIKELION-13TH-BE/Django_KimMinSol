@@ -13,10 +13,16 @@
 </nav>
 <hr>
 
-<h2>회원 정보 수정</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">수정하기</button>
-</form>
+<h2>내 게시글</h2>
+<ul>
+  {% for post in posts %}
+    <li>
+      <strong>{{ post.title }}</strong><br>
+      {{ post.created_at|date:"Y-m-d H:i" }}<br>
+      <a href="{% url 'post_edit' post.id %}">수정</a> |
+      <a href="{% url 'post_delete' post.id %}">삭제</a>
+    </li>
+  {% empty %}
+    <p>작성한 게시글이 없습니다.</p>
+  {% endfor %}
+</ul>

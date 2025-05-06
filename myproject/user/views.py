@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, get_user_model
 from .forms import SignUpForm, LoginForm, UserUpdateForm
 from django.contrib.auth.decorators import login_required
+from board.models import Post
 
 def signup_view(request):
     if request.method == 'POST':
@@ -51,3 +52,8 @@ def edit_profile(request) :
         form = UserUpdateForm(instance=request.user)
         
     return render(request, 'user/edit_profile.html', {'form': form})
+
+@login_required
+def my_posts(request):
+    posts = Post.objects.filter(author=request.user).order_by('-created_at')
+    return render(request, 'user/my_posts.html', {'posts': posts})
