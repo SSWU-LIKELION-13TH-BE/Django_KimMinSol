@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class SignUpForm(UserCreationForm) :
     email = forms.EmailField(required=True)  # 이메일 필수
@@ -22,4 +25,11 @@ class LoginForm(AuthenticationForm) :
     def __init__(self, request = None, *args, **kwargs) :
         super().__init__(request, *args, **kwargs)
         self.fields['username'] = self.fields.pop('user_id')
+
+class UserUpdateForm(forms.ModelForm) :
+    password = forms.CharField(widget = forms.PasswordInput(), required = False)
+
+    class Meta :
+        model = User
+        fields = ['user_id', 'nickname', 'email', 'password']
 
