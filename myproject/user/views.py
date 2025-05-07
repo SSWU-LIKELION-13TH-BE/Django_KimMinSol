@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, get_user_model
-from .forms import SignUpForm, LoginForm, UserUpdateForm
+from .forms import SignUpForm, LoginForm, UserUpdateForm, GuestbookForm
 from django.contrib.auth.decorators import login_required
 from board.models import Post
+from .models import Guestbook
+from django.http import Http404
 
 def signup_view(request):
     if request.method == 'POST':
@@ -54,6 +56,67 @@ def edit_profile(request) :
     return render(request, 'user/edit_profile.html', {'form': form})
 
 @login_required
-def my_posts(request):
+def my_posts(request) :
     posts = Post.objects.filter(author=request.user).order_by('-created_at')
-    return render(request, 'user/my_posts.html', {'posts': posts})
+    guestbooks = Guestbook.objects.filter(owner=request.user).order_by('-created_at')
+    return render(request, 'user/my_posts.html', {
+        'posts': posts,
+        'guestbooks': guestbooks,
+    })
+
+User = get_user_model()
+
+@login_required
+def guestbook_view(request, user_id):
+    owner = User.objects.get(user_id=user_id)
+
+    if request.method == 'POST':
+        form = GuestbookForm(request.POST)
+        if form.is_valid() :
+            guestbook = form.save(commit = False)
+            guestbook.owner = owner
+            guestbook.writer = request.user
+            guestbook.save()
+            return redirect('guestbook', user_id = owner.user_id)
+    else:
+        form = GuestbookForm()
+
+    if request.user == owner:
+        guestbooks = Guestbook.objects.filter(owner = owner).order_by('-created_at')
+    else:
+        guestbooks = None
+
+    return render(request, 'user/guestbook.html', {
+        'form': form,
+        'owner': owner,
+        'guestbooks': guestbooks
+    })
+
+
+@login_required
+def user_profile(request, user_id):
+    try:
+        owner = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        raise Http404("해당 사용자가 존재하지 않습니다.")
+
+    posts = Post.objects.filter(author=owner).order_by('-created_at')
+    guestbooks = Guestbook.objects.filter(owner=owner).order_by('-created_at')
+
+    if request.method == 'POST':
+        form = GuestbookForm(request.POST)
+        if form.is_valid():
+            guestbook = form.save(commit=False)
+            guestbook.owner = owner
+            guestbook.writer = request.user
+            guestbook.save()
+            return redirect('user_profile', user_id=owner.user_id)
+    else:
+        form = GuestbookForm()
+
+    return render(request, 'user/profile.html', {
+        'owner': owner,
+        'posts': posts,
+        'guestbooks': guestbooks,
+        'form': form,
+    })

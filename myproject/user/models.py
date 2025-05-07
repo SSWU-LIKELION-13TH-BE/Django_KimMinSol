@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.conf import settings
 
 class CustomUser(AbstractUser):
     
@@ -15,3 +16,15 @@ class CustomUser(AbstractUser):
 
     def __str__(self) :
         return self.user_id
+    
+class Guestbook(models.Model):
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='guestbooks', on_delete=models.CASCADE) 
+
+    writer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='guestbook_written', on_delete=models.CASCADE)
+    
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.writer} → {self.owner}"

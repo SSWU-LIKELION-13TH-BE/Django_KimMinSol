@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser
+from .models import CustomUser, Guestbook
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -32,4 +32,13 @@ class UserUpdateForm(forms.ModelForm) :
     class Meta :
         model = User
         fields = ['user_id', 'nickname', 'email', 'password']
+
+class GuestbookForm(forms.ModelForm) :
+
+    class Meta:
+        model = Guestbook
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs = {'placeholder': '방명록을 작성해주세요!', 'rows': 3}),
+        }
 
