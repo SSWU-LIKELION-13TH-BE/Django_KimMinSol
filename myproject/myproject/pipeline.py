@@ -11,7 +11,12 @@ def create_custom_user(strategy, details, backend, user=None, *args, **kwargs):
         return {'user': user}
 
     email = details.get('email')
-    nickname = details.get('nickname') or details.get('name') or '네이버사용자'
+    if backend.name == 'naver':
+        nickname = details.get('nickname') or '네이버사용자'
+    elif backend.name == 'kakao':
+        nickname = details.get('nickname') or '카카오사용자'
+    else:
+        nickname = '소셜사용자'
 
     user_id = kwargs.get('uid') or email or strategy.session_get('user_id_fallback')
 
