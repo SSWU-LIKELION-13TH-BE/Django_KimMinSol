@@ -146,9 +146,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTHENTICATION_BACKENDS = [
+    'social_core.backends.kakao.KakaoOAuth2', 
     'social_core.backends.naver.NaverOAuth2',  
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+SOCIAL_AUTH_KAKAO_KEY = os.environ.get('SOCIAL_AUTH_KAKAO_KEY')
+SOCIAL_AUTH_KAKAO_REDIRECT_URI = 'http://127.0.0.1:8000/auth/complete/kakao/'
+SOCIAL_AUTH_KAKAO_SCOPE = ['profile_nickname']
 
 SOCIAL_AUTH_NAVER_KEY = 'xgzdJuOuHlzgq6RTVLnX'
 SOCIAL_AUTH_NAVER_SECRET = 'I4IQPaEGv9'
