@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0qurf-kx59f4c=64pfore5r6b!h0&b^xl9dqq-p@wkgmlp%oo3'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -137,8 +137,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'syms2733@gmail.com'  
-EMAIL_HOST_PASSWORD = 'yyoc ztep fylq znoh' 
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_URL = '/user/login/'
 
@@ -155,8 +155,8 @@ SOCIAL_AUTH_KAKAO_KEY = os.environ.get('SOCIAL_AUTH_KAKAO_KEY')
 SOCIAL_AUTH_KAKAO_REDIRECT_URI = 'http://127.0.0.1:8000/auth/complete/kakao/'
 SOCIAL_AUTH_KAKAO_SCOPE = ['profile_nickname']
 
-SOCIAL_AUTH_NAVER_KEY = 'xgzdJuOuHlzgq6RTVLnX'
-SOCIAL_AUTH_NAVER_SECRET = 'I4IQPaEGv9'
+SOCIAL_AUTH_NAVER_KEY = os.getenv('SOCIAL_AUTH_NAVER_KEY')
+SOCIAL_AUTH_NAVER_SECRET = os.getenv('SOCIAL_AUTH_NAVER_SECRET')
 SOCIAL_AUTH_NAVER_CALLBACK_URL = 'http://127.0.0.1:8000/auth/complete/naver/'
 SOCIAL_AUTH_NAVER_SCOPE = ['name', 'email']
 SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
